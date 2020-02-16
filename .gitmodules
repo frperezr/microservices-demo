@@ -1,0 +1,20 @@
+[submodule "src/auth-api"]
+	path = src/auth-api
+	url = git@github.com:frperezr/microservices-demo-auth-api.git
+	branch = master
+[submodule "src/users-api"]
+	path = src/users-api
+	url = git@github.com:frperezr/microservices-demo-users-api.git
+	branch = master
+[submodule "src/gateway-api"]
+	path = src/gateway-api
+	url = git@github.com:frperezr/microservices-demo-gateway-api.git
+	branch = master
+[submodule "src/budgets-api"]
+	path = src/budgets-api
+	url = git@github.com:frperezr/microservices-demo-budgets-api.git
+	branch = master
+[submodule "src/countries-api"]
+	path = src/countries-api
+	url = git@github.com:frperezr/microservices-demo-countries-api.git
+	branch = master

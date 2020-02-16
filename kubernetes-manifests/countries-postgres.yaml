@@ -1,0 +1,93 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: countries-postgres-config
+  labels:
+    app: countries-postgres
+data:
+  POSTGRES_DB: postgres
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: countries-postgres-pv-volume
+  labels:
+    type: local
+    app: countries-postgres
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/mnt/data/countries"
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: countries-postgres-pv-claim
+  labels:
+    app: countries-postgres
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: countries-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: countries-postgres
+  template:
+    metadata:
+      labels:
+        app: countries-postgres
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      containers:
+        - name: countries-postgres
+          image: postgres:10.4
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 5432
+          envFrom:
+            - configMapRef:
+                name: countries-postgres-config
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: countries-postgresdb
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+      volumes:
+        - name: countries-postgresdb
+          persistentVolumeClaim:
+            claimName: countries-postgres-pv-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: countries-postgres
+  labels:
+    app: countries-postgres
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5432
+  selector:
+    app: countries-postgres

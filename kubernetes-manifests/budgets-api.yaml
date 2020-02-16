@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: budgets-api
+  labels:
+    app: budgets-api
+    service: budgets-api
+spec:
+  ports:
+    - port: 3040
+      name: http
+  selector:
+    app: budgets-api
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: microservices-demo-budgets-api
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: budgets-api
+  labels:
+    app: budgets-api
+  annotations:
+    sidecar.istio.io/inject: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: budgets-api
+  template:
+    metadata:
+      labels:
+        app: budgets-api
+    spec:
+      serviceAccountName: microservices-demo-budgets-api
+      containers:
+        - name: budgets-api
+          image: frperezr/microservices-demo-budgets-api:0.0.1
+          ports:
+            - containerPort: 3040
+          env:
+            - name: PORT
+              value: "3040"
+            - name: POSTGRES_DSN
+              value: postgres://postgres:postgres@budgets-postgres:5432/postgres?sslmode=disable
+            - name: PROTO_PATH
+              value: /budgets-api/pb/demo.proto
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi

@@ -1,0 +1,48 @@
+apiVersion: skaffold/v1
+kind: Config
+metadata:
+  name: microservices-demo
+build:
+  artifacts:
+    - image: frperezr/microservices-demo-auth-api
+      context: src/auth-api
+    - image: frperezr/microservices-demo-budgets-api
+      context: src/budgets-api
+    - image: frperezr/microservices-demo-users-api
+      context: src/users-api
+    - image: frperezr/microservices-demo-countries-api
+      context: src/countries-api
+    - image: frperezr/microservices-demo-gateway-api
+      context: src/gateway-api
+deploy:
+  kubectl:
+    manifests:
+      - kubernetes-manifests/auth-api.yaml
+      - kubernetes-manifests/budgets-api.yaml
+      - kubernetes-manifests/budgets-postgres.yaml
+      - kubernetes-manifests/users-api.yaml
+      - kubernetes-manifests/users-postgres.yaml
+      - kubernetes-manifests/countries-api.yaml
+      - kubernetes-manifests/countries-postgres.yaml
+      - kubernetes-manifests/gateway-api.yaml
+portForward:
+  - resourceType: deployment
+    resourceName: budgets-api
+    port: 3040
+    localPort: 3040
+  - resourceType: deployment
+    resourceName: auth-api
+    port: 3020
+    localPort: 3020
+  - resourceType: deployment
+    resourceName: users-api
+    port: 3050
+    localPort: 3050
+  - resourceType: deployment
+    resourceName: countries-api
+    port: 3030
+    localPort: 3030
+  - resourceType: deployment
+    resourceName: gateway-api
+    port: 4000
+    localPort: 4000
