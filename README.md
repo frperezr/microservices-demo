@@ -71,7 +71,7 @@ cd src/countries-api && make i && make b && make s && cd ../..
 # Start minikube
 
 ```
-minikube start --memory=16384 --cpus=4 --kubernetes-version=v1.14.2
+minikube start --memory=16384 --cpus=4
 ```
 
 # Run skaffold
